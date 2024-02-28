@@ -1,6 +1,7 @@
 from chatbot import QAChain
 import streamlit as st
 import os
+from chatbot_w_memory import ConversationalRetrievalChain
 
 # App title
 st.set_page_config(page_title="🦜🔗💬 LangChain 1 Chatbot")
@@ -35,7 +36,7 @@ st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 
 def generate_openai_response(prompt_input):
-    qa_chain = QAChain().create_chain()
+    qa_chain = ConversationalRetrievalChain().create_chain()
     result = qa_chain({"query": prompt_input})
     return result['result']
 
