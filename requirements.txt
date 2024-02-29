@@ -1,4 +1,7 @@
-streamlit
-openai
-langchain_community
+streamlit 
+langchain-openai
+langchain
+chromadb
+python-dotenv
+bs4
 
