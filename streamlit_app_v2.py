@@ -57,7 +57,7 @@ def main():
 
 
     def generate_openai_response(prompt_input):
-        qa_chain = ConversationalRetrievalChain().create_chain()
+        qa_chain = ConversationalRetrievalChain().create_chain('youtube', url_input, None, None)
         result = qa_chain({"query": prompt_input})
         return result['result']
 
