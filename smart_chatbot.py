@@ -16,7 +16,8 @@ class VectorDB:
                  directory='docs/my_docs',
                  glob='./*.pdf',
                  data_format:str = None,
-                 url='https://en.wikipedia.org/wiki/General_relativity'
+                 url='https://de.wikipedia.org/wiki/Sokrates'
+                #  url='https://en.wikipedia.org/wiki/General_relativity'
                  ):
         self.directory = directory
         self.glob = glob
