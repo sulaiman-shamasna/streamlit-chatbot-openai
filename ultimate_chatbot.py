@@ -16,8 +16,8 @@ class VectorDB:
     
     def __init__(self, 
                  data_format:str = None,
-                 wiki_url: str = 'https://de.wikipedia.org/wiki/Sokrates',
-                 youtube_url: str = None, # 'https://www.youtube.com/watch?v=DcWqzZ3I2cY'
+                 wiki_url: str = None,          # 'https://de.wikipedia.org/wiki/Sokrates',
+                 youtube_url: str = None,       # 'https://www.youtube.com/watch?v=DcWqzZ3I2cY'
                  pdf_dir: str = 'docs/my_docs',
                  glob: str ='./*.pdf',
                  ):

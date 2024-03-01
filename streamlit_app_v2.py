@@ -31,16 +31,11 @@ def main():
 
     with tab2:
         url_input = st.text_input("YouTube URL", placeholder="Enter the website URL here...")
-        # # if st.button("Save"):
-        # #     st.write('URL:', url_input)
-        # if st.session_state.prev_url_input != url_input:
-        #     st.session_state.prev_url_input = url_input
-            # st.write('URL:', url_input)
-        # logging.info('URL', url_input)
-        print('URL', url_input)
+        data_format = 'youtube'
 
-    # with tab3:
-    #     url_input = st.text_input("Wikipedia URL", placeholder="Enter the website URL here...")
+    with tab3:
+        url_input = st.text_input("Wikipedia URL", placeholder="Enter the website URL here...")
+        data_format = 'Wikipedia'
 
     # Store LLM generated responses
     if "messages" not in st.session_state.keys():
@@ -57,7 +52,7 @@ def main():
 
 
     def generate_openai_response(prompt_input):
-        qa_chain = ConversationalRetrievalChain().create_chain('youtube', url_input, None, None)
+        qa_chain = ConversationalRetrievalChain().create_chain(data_format, url_input, None, None)
         result = qa_chain({"query": prompt_input})
         return result['result']
 
