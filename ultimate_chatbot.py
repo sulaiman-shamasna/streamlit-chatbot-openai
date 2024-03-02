@@ -7,6 +7,8 @@ from langchain.vectorstores import Chroma
 from langchain_community.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from glob import glob
+import os
 
 
 class VectorDB:
@@ -15,22 +17,25 @@ class VectorDB:
     def __init__(self, 
                  data_format:str = None,
                  url:str = None,
-                 glob: str ='./*.pdf',
+                #  glob: str ='./*.pdf',
                  ):
 
         self.data_format = data_format
         self.url = url
-        self.glob = glob
+        # self.glob = glob
 
     def create_vector_db(self):
 
         if self.data_format.lower() == 'pdf':
-            loader = DirectoryLoader(self.url,
-                                     glob=self.glob,
-                                     loader_cls=PyPDFLoader
-                                     )
+            files = glob(os.path.join(self.url, "*.pdf"))
+            loadPDFs = [PyPDFLoader(pdf_file) for pdf_file in files]
+
+            pdf_docs = list()
+            for loader in loadPDFs:
+                pdf_docs.extend(loader.load())
+
             text_splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=10)
-            texts = text_splitter.split_documents(loader.load())
+            texts = text_splitter.split_documents(pdf_docs)
             embeddings = OpenAIEmbeddings()
             return Chroma.from_documents(texts, embeddings)
         
