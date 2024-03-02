@@ -22,6 +22,14 @@ def main():
         url_input = st.text_input("Wikipedia URL", placeholder="Enter the website URL here...")
         app_tabs['wikipedia'] = url_input
 
+    if 'youtube' in app_tabs and isinstance(app_tabs['youtube'], str) and app_tabs['youtube'].strip():
+        url = app_tabs.get('youtube')
+        data_format = 'youtube'
+
+    if 'wikipedia' in app_tabs and isinstance(app_tabs['wikipedia'], str) and app_tabs['wikipedia'].strip():
+        url = app_tabs.get('wikipedia')
+        data_format = 'wikipedia'
+
     # Replicate Credentials
     with st.sidebar:
         st.title('🦜🔗 Chat with your Data 💬')
@@ -53,7 +61,7 @@ def main():
 
 
     def generate_openai_response(prompt_input):
-        qa_chain = ConversationalRetrievalChain().create_chain('wikipedia', app_tabs.get('wikipedia'))
+        qa_chain = ConversationalRetrievalChain().create_chain(data_format, url)
         result = qa_chain({"query": prompt_input})
         return result['result']
 
