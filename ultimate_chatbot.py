@@ -17,39 +17,34 @@ class VectorDB:
     def __init__(self, 
                  data_format:str = None,
                  url:str = None,
-                #  glob: str ='./*.pdf',
                  ):
 
         self.data_format = data_format
         self.url = url
-        # self.glob = glob
 
     def create_vector_db(self):
 
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+
         if self.data_format.lower() == 'pdf':
             files = glob(os.path.join(self.url, "*.pdf"))
+
             loadPDFs = [PyPDFLoader(pdf_file) for pdf_file in files]
 
             pdf_docs = list()
             for loader in loadPDFs:
                 pdf_docs.extend(loader.load())
-
-            text_splitter = CharacterTextSplitter(chunk_size=100, chunk_overlap=10)
-            texts = text_splitter.split_documents(pdf_docs)
-            embeddings = OpenAIEmbeddings()
-            return Chroma.from_documents(texts, embeddings)
+            chunks = text_splitter.split_documents(pdf_docs)
         
         elif self.data_format.lower() == 'wikipedia':
             loader = WebBaseLoader(self.url)
-            text_splitter = RecursiveCharacterTextSplitter()
-            document_chunks = text_splitter.split_documents(loader.load()) 
-            return Chroma.from_documents(document_chunks, OpenAIEmbeddings()) 
+            chunks = text_splitter.split_documents(loader.load()) 
         
         elif self.data_format.lower() == 'youtube':
-            loader = YoutubeLoader.from_youtube_url(self.url)
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-            document_chunks = text_splitter.split_documents(loader.load())
-            return Chroma.from_documents(document_chunks, OpenAIEmbeddings()) 
+            loader = YoutubeLoader.from_youtube_url(self.url)    
+            chunks = text_splitter.split_documents(loader.load())
+            
+        return Chroma.from_documents(chunks, OpenAIEmbeddings()) 
         
 class ConversationalRetrievalChain:
     """Class to manage the QA chain setup."""
@@ -61,7 +56,7 @@ class ConversationalRetrievalChain:
     def create_chain(self, data_format:str,
                      url:str,
                      ):
-        
+
         model = ChatOpenAI(model_name=self.model_name,
                            temperature=self.temperature,
                            )
@@ -70,20 +65,17 @@ class ConversationalRetrievalChain:
             memory_key="chat_history",
             return_messages=True
             )
-        
         vector_db = VectorDB(data_format=data_format,
-                             url=url
+                             url=url,
                              )
-
         retriever = vector_db.create_vector_db().as_retriever(search_type="similarity",
                                                               search_kwargs={"k": 2},
                                                               )
-
         return RetrievalQA.from_chain_type(
             llm=model,
             retriever=retriever,
             memory=memory,
-        )
+            )
 def main():
     """Main function to execute the QA system."""
     query = input('\n Q: ')
