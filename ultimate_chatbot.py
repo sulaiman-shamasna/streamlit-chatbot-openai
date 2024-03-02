@@ -6,9 +6,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain_community.chat_models import ChatOpenAI
 from langchain.memory import ConversationBufferMemory
-from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.chains.question_answering import load_qa_chain
 
 
 class VectorDB:
@@ -17,21 +15,17 @@ class VectorDB:
     def __init__(self, 
                  data_format:str = None,
                  url:str = None,
-                #  wiki_url: str = None,          # 'https://de.wikipedia.org/wiki/Sokrates',
-                #  youtube_url: str = None,       # 'https://www.youtube.com/watch?v=DcWqzZ3I2cY'
-                 pdf_dir: str = 'docs/my_docs',
                  glob: str ='./*.pdf',
                  ):
 
         self.data_format = data_format
         self.url = url
-        self.pdf_dir = pdf_dir
         self.glob = glob
 
     def create_vector_db(self):
 
         if self.data_format.lower() == 'pdf':
-            loader = DirectoryLoader(self.pdf_dir,
+            loader = DirectoryLoader(self.url,
                                      glob=self.glob,
                                      loader_cls=PyPDFLoader
                                      )
@@ -58,15 +52,11 @@ class ConversationalRetrievalChain:
     def __init__(self, model_name="gpt-3.5-turbo", temperature=0):
         self.model_name = model_name
         self.temperature = temperature
-
-    # def get_parameters(self, data_format, ):
-    #     return
-        
+      
     def create_chain(self, data_format:str,
                      url:str,
                      ):
-
-
+        
         model = ChatOpenAI(model_name=self.model_name,
                            temperature=self.temperature,
                            )
@@ -76,7 +66,6 @@ class ConversationalRetrievalChain:
             return_messages=True
             )
         
-        # vector_db = VectorDB(data_format='youtube', youtube_url=youtube_url)
         vector_db = VectorDB(data_format=data_format,
                              url=url
                              )
