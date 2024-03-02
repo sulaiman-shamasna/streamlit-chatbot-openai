@@ -16,15 +16,15 @@ class VectorDB:
     
     def __init__(self, 
                  data_format:str = None,
-                 wiki_url: str = None,          # 'https://de.wikipedia.org/wiki/Sokrates',
-                 youtube_url: str = None,       # 'https://www.youtube.com/watch?v=DcWqzZ3I2cY'
+                 url:str = None,
+                #  wiki_url: str = None,          # 'https://de.wikipedia.org/wiki/Sokrates',
+                #  youtube_url: str = None,       # 'https://www.youtube.com/watch?v=DcWqzZ3I2cY'
                  pdf_dir: str = 'docs/my_docs',
                  glob: str ='./*.pdf',
                  ):
 
         self.data_format = data_format
-        self.wiki_url = wiki_url
-        self.youtube_url = youtube_url
+        self.url = url
         self.pdf_dir = pdf_dir
         self.glob = glob
 
@@ -41,13 +41,13 @@ class VectorDB:
             return Chroma.from_documents(texts, embeddings)
         
         elif self.data_format.lower() == 'wikipedia':
-            loader = WebBaseLoader(self.wiki_url)
+            loader = WebBaseLoader(self.url)
             text_splitter = RecursiveCharacterTextSplitter()
             document_chunks = text_splitter.split_documents(loader.load()) 
             return Chroma.from_documents(document_chunks, OpenAIEmbeddings()) 
         
         elif self.data_format.lower() == 'youtube':
-            loader = YoutubeLoader.from_youtube_url(self.youtube_url)
+            loader = YoutubeLoader.from_youtube_url(self.url)
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
             document_chunks = text_splitter.split_documents(loader.load())
             return Chroma.from_documents(document_chunks, OpenAIEmbeddings()) 
@@ -63,10 +63,9 @@ class ConversationalRetrievalChain:
     #     return
         
     def create_chain(self, data_format:str,
-                     youtube_url:str,
-                     wiki_url:str,
-                     pdf_dir:str
+                     url:str,
                      ):
+
 
         model = ChatOpenAI(model_name=self.model_name,
                            temperature=self.temperature,
@@ -79,9 +78,7 @@ class ConversationalRetrievalChain:
         
         # vector_db = VectorDB(data_format='youtube', youtube_url=youtube_url)
         vector_db = VectorDB(data_format=data_format,
-                             youtube_url=youtube_url,
-                             wiki_url=wiki_url,
-                             pdf_dir=pdf_dir
+                             url=url
                              )
 
         retriever = vector_db.create_vector_db().as_retriever(search_type="similarity",

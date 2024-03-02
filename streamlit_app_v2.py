@@ -11,6 +11,17 @@ def main():
     # App title
     st.set_page_config(page_title="🦜🔗 Chat with your Data 💬")
 
+    app_tabs = dict()
+    tab1, tab2, tab3 = st.tabs(["Upload PDF File", "Enter YouTube URL", "Enter Wikipedia URL"])
+
+    with tab2:
+        url_input = st.text_input("YouTube URL", placeholder="Enter the website URL here...")
+        app_tabs['youtube'] = url_input
+
+    with tab3:
+        url_input = st.text_input("Wikipedia URL", placeholder="Enter the website URL here...")
+        app_tabs['wikipedia'] = url_input
+
     # Replicate Credentials
     with st.sidebar:
         st.title('🦜🔗 Chat with your Data 💬')
@@ -27,16 +38,6 @@ def main():
         st.markdown('📖 Follow me for more [Github](https://github.com/sulaiman-shamasna)!')
     os.environ['OPENAI_API_KEY'] = replicate_api
 
-    tab1, tab2, tab3 = st.tabs(["Upload PDF File", "Enter YouTube URL", "Enter Wikipedia URL"])
-
-    with tab2:
-        url_input = st.text_input("YouTube URL", placeholder="Enter the website URL here...")
-        data_format = 'youtube'
-
-    with tab3:
-        url_input = st.text_input("Wikipedia URL", placeholder="Enter the website URL here...")
-        data_format = 'Wikipedia'
-
     # Store LLM generated responses
     if "messages" not in st.session_state.keys():
         st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
@@ -52,7 +53,7 @@ def main():
 
 
     def generate_openai_response(prompt_input):
-        qa_chain = ConversationalRetrievalChain().create_chain(data_format, url_input, None, None)
+        qa_chain = ConversationalRetrievalChain().create_chain('wikipedia', app_tabs.get('wikipedia'))
         result = qa_chain({"query": prompt_input})
         return result['result']
 
